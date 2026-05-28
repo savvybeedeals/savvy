@@ -17,11 +17,17 @@ savvy-code
 │  │  ├─ contact
 │  │  │  └─ page.tsx
 │  │  ├─ coupons
-│  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  └─ [couponSlug]
+│  │  │     └─ page.tsx
 │  │  ├─ deals
-│  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  └─ [dealsslug]
+│  │  │     └─ page.tsx
 │  │  ├─ discounts
-│  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  └─ [discountSlug]
+│  │  │     └─ page.tsx
 │  │  ├─ forgot-password
 │  │  │  └─ page.tsx
 │  │  ├─ layout.tsx
