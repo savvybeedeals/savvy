@@ -1,154 +1,29 @@
+# 🍯 Savvy Bee Deals
 
-```
-savvy-code
-├─ AGENTS.md
-├─ app
-│  ├─ (main)
-│  │  ├─ about
-│  │  │  └─ page.tsx
-│  │  ├─ blog
-│  │  │  ├─ page.tsx
-│  │  │  └─ [blogSlug]
-│  │  │     └─ page.tsx
-│  │  ├─ categories
-│  │  │  └─ [[...categorySlug]]
-│  │  │     └─ page.tsx
-│  │  ├─ contact
-│  │  │  └─ page.tsx
-│  │  ├─ coupons
-│  │  │  └─ page.tsx
-│  │  ├─ deals
-│  │  │  └─ page.tsx
-│  │  ├─ discounts
-│  │  │  └─ page.tsx
-│  │  ├─ forgot-password
-│  │  │  └─ page.tsx
-│  │  ├─ layout.tsx
-│  │  ├─ login
-│  │  │  └─ page.tsx
-│  │  ├─ privacy
-│  │  │  └─ page.tsx
-│  │  ├─ profile
-│  │  │  └─ page.tsx
-│  │  ├─ register
-│  │  │  └─ page.tsx
-│  │  ├─ reset-password
-│  │  │  └─ page.tsx
-│  │  ├─ search
-│  │  │  └─ page.tsx
-│  │  ├─ support
-│  │  │  └─ page.tsx
-│  │  └─ terms
-│  │     └─ page.tsx
-│  ├─ admin
-│  │  └─ [[...tool]]
-│  │     └─ page.tsx
-│  ├─ api
-│  │  ├─ coupon
-│  │  │  ├─ save-coupon
-│  │  │  │  └─ route.ts
-│  │  │  └─ update-stats
-│  │  │     └─ route.ts
-│  │  ├─ deals
-│  │  │  └─ save-deals
-│  │  │     └─ route.ts
-│  │  ├─ delete-account
-│  │  │  └─ route.ts
-│  │  ├─ discounts
-│  │  │  └─ save-discounts
-│  │  │     └─ route.ts
-│  │  ├─ revalidate
-│  │  │  └─ route.ts
-│  │  └─ send-email
-│  │     └─ route.ts
-│  ├─ favicon.ico
-│  ├─ globals.css
-│  ├─ layout.tsx
-│  ├─ page.tsx
-│  ├─ robots.ts
-│  ├─ sitemap.ts
-│  └─ stores
-│     ├─ page.tsx
-│     └─ [storeSlug]
-│        └─ page.tsx
-├─ CLAUDE.md
-├─ components
-│  ├─ collections
-│  │  ├─ blog-grid.tsx
-│  │  ├─ category-filter.tsx
-│  │  ├─ coupons-filter.tsx
-│  │  ├─ coupons-grid.tsx
-│  │  ├─ deals-filter.tsx
-│  │  ├─ deals-grid.tsx
-│  │  └─ discounts-grid.tsx
-│  ├─ forms
-│  │  ├─ contact-form.tsx
-│  │  ├─ delete-account-form.tsx
-│  │  ├─ forgot-password-form.tsx
-│  │  ├─ login-form.tsx
-│  │  └─ register-form.tsx
-│  ├─ layout
-│  │  ├─ footer.tsx
-│  │  ├─ header.tsx
-│  │  ├─ mobile-menu.tsx
-│  │  └─ motion-wrapper.tsx
-│  ├─ modules
-│  │  ├─ blog-card.tsx
-│  │  ├─ coupon-card.tsx
-│  │  ├─ deals-card.tsx
-│  │  ├─ discounts-card.tsx
-│  │  ├─ profile-settings-modal.tsx
-│  │  └─ store-card.tsx
-│  └─ ui
-│     └─ vip-button.tsx
-├─ context
-│  └─ auth-context.tsx
-├─ eslint.config.mjs
-├─ lib
-│  ├─ constants.ts
-│  ├─ sanity.queries.ts
-│  ├─ supabase.ts
-│  └─ utils.ts
-├─ next.config.ts
-├─ package-lock.json
-├─ package.json
-├─ postcss.config.mjs
-├─ public
-│  ├─ file.svg
-│  ├─ globe.svg
-│  ├─ next.svg
-│  ├─ vercel.svg
-│  └─ window.svg
-├─ sanity
-│  ├─ env.ts
-│  ├─ lib
-│  │  ├─ client.ts
-│  │  ├─ image.ts
-│  │  └─ live.ts
-│  ├─ schema.ts
-│  ├─ schemaTypes
-│  │  ├─ appSettings.ts
-│  │  ├─ blog.ts
-│  │  ├─ category.ts
-│  │  ├─ coupon.ts
-│  │  ├─ deals.ts
-│  │  ├─ discounts.ts
-│  │  ├─ index.ts
-│  │  └─ store.ts
-│  └─ structure.ts
-├─ sanity.cli.ts
-├─ sanity.config.ts
-├─ services
-│  ├─ app-service.ts
-│  ├─ blog-service.ts
-│  ├─ category-service.ts
-│  ├─ client.ts
-│  ├─ coupon-service.ts
-│  ├─ deals-service.ts
-│  ├─ discounts-service.ts
-│  └─ store-service.ts
-├─ tsconfig.json
-└─ types
-   └─ index.ts
+Welcome to **Savvy Bee Deals**, a modern, high-performance web platform built for affiliate marketing, digital coupons, promo codes, and dynamic flash discounts. The platform targets high-purchasing shopping seasons across the United States and European markets.
 
-```
+## 🚀 Tech Stack
+
+- **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS & Framer Motion (for sweet animations 🐝)
+- **Content Management:** Sanity CMS (Structured data & asset pipelines)
+- **Database & Backend:** Supabase (Deployed across US & EU regions)
+
+## 🏗️ Architecture & Optimization
+
+The platform utilizes a hybrid architecture splitting views into highly optimized Server and Client components to guarantee **100% SEO efficacy** and lightning-fast Core Web Vitals:
+
+- **Server Components (`page.tsx`):** Handles parallel server-side data fetching directly from Sanity CMS and dynamically generates rich metadata, OpenGraph tags, and semantic headers for flawless search engine indexation.
+- **Client Components (`*Client.tsx`):** Manages dynamic UI micro-interactions, responsive states, client-side pagination (`Load More`), and fluid layouts without visual glitches.
+
+---
+
+## 🛠️ Development & Deployment
+
+### Prerequisites
+Make sure you have your environment variables configured for Sanity and Supabase in your `.env.local`:
+```env
+NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
+NEXT_PUBLIC_SANITY_DATASET=your_dataset
+# Add other Supabase & API tokens here
