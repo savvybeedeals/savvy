@@ -1,27 +1,33 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { client } from "@/services/client"; // استيراد العميل لجلب البيانات المخصصة بالمتجر كاملة
+import { client } from "@/services/client"; 
 import { getAllStores } from "@/services/store-service";
 import { getLatestCoupons } from "@/services/coupon-service"; 
-import { getLatestDeals } from "@/services/deals-service"; // استيراد دالة جلب العروض لعرض الموكاب الحقيقي
+import { getLatestDeals } from "@/services/deals-service"; 
 import { urlFor } from "@/sanity/lib/image"; 
 import { MotionDiv } from "@/components/layout/motion-wrapper"; 
 import { VipButton } from "@/components/ui/vip-button";
-
-// استيراد شبكة الكوبونات الفعالة
 import { CouponsGrid } from "@/components/collections/coupons-grid";
-
-// استيراد شبكة الخصومات الفعالة
 import { DiscountsGrid } from "@/components/collections/discounts-grid";
-
-// استيراد شبكة العروض الفعالة لعرضها في القسم الخاص بها
 import { DealsGrid } from "@/components/collections/deals-grid";
+
+// [SEO 2026] تخصيص الـ Metadata الخاصة بالصفحة الرئيسية وتوريث قالب الـ Layout العالمي
+export const metadata: Metadata = {
+  title: "Home", 
+  description: "Find the latest, 100% verified promo codes, hot deals, and shopping discount vouchers for your favorite online stores at Savvy Bee Deals.",
+  openGraph: {
+    title: "Savvy Bee Deals | Best Coupons, Promo Codes & Discounts",
+    description: "Find the latest, 100% verified promo codes, hot deals, and shopping discount vouchers.",
+    url: "https://savvybeedeals.com",
+  }
+};
 
 export default async function Home() {
   // جلب البيانات الحقيقية تزامنياً بالكامل من Sanity للكوبونات والمتاجر والخصومات والعروض
   const stores = await getAllStores();
   const latestCoupons = await getLatestCoupons(); 
-  const latestDeals = await getLatestDeals(); // جلب العروض الحقيقية التجريبية لعرضها مباشرة ومعاينتها
+  const latestDeals = await getLatestDeals(); 
 
   // جلب الـ 4 خصومات الحقيقية الأحدث وتشكيل الـ id والـ store ليتطابق مع الـ Grid والكروت ويختفي خطأ الـ Key تماماً
   const latestDiscounts = await client.fetch(`
@@ -48,8 +54,52 @@ export default async function Home() {
     }
   `);
 
+  // [SEO 2026] إنتاج الـ JSON-LD Schema لإصدار البيانات المهيكلة لمحرك البحث لجوجل
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://savvybeedeals.com/#organization",
+        "name": "Savvy Bee Deals",
+        "url": "https://savvybeedeals.com",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://savvybeedeals.com/apple-touch-icon.png",
+          "width": "180",
+          "height": "180"
+        },
+        "sameAs": [
+          "https://x.com/SavvyBeeDeals"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://savvybeedeals.com/#website",
+        "url": "https://savvybeedeals.com",
+        "name": "Savvy Bee Deals",
+        "description": "Smart Shopping, Bigger Savings. Verified coupons and promo codes.",
+        "publisher": {
+          "@id": "https://savvybeedeals.com/#organization"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://savvybeedeals.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  };
+
   return (
     <div className="flex flex-col min-h-screen font-sans bg-[#F8F9FA]">
+      
+      {/* حقن البيانات المهيكلة لجوجل لتعزيز ترتيب أرشفة موقع Savvy Bee Deals */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <main className="flex-grow">
         
         {/* ================= HERO SECTION ================= */}
@@ -88,7 +138,6 @@ export default async function Home() {
               <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter text-slate-900 uppercase">
                 Trusted <span className="text-sky-500 not-italic">Brands</span>
               </h2>
-              {/* حاوية توحيد الأبعاد بالكامل أفقياً ورأسياً للزر الأول */}
               <div className="w-full sm:w-56 h-14 flex [&>a]:w-full [&>a]:h-full [&>a>div]:!w-full [&>a>div>div]:!w-full [&>a>div>div]:!h-full [&>a>div>div]:justify-center">
                 <VipButton text="All Stores" href="/stores" variant="sky" />
               </div>
@@ -143,7 +192,6 @@ export default async function Home() {
               <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter text-slate-900 uppercase">
                 LATEST <span className="text-sky-500 not-italic">COUPONS</span>
               </h2>
-              {/* حاوية توحيد الأبعاد بالكامل أفقياً ورأسياً للزر الثاني */}
               <div className="w-full sm:w-56 h-14 flex [&>a]:w-full [&>a]:h-full [&>a>div]:!w-full [&>a>div>div]:!w-full [&>a>div>div]:!h-full [&>a>div>div]:justify-center">
                 <VipButton text="All Coupons" href="/coupons" variant="sky" />
               </div>
@@ -180,13 +228,12 @@ export default async function Home() {
               <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter text-slate-900 uppercase leading-none">
                 Flash <span className="text-sky-500 not-italic">Discounts</span>
               </h2>
-              {/* حاوية توحيد الأبعاد بالكامل أفقياً ورأسياً للزر الثالث */}
               <div className="w-full sm:w-56 h-14 flex [&>a]:w-full [&>a]:h-full [&>a>div]:!w-full [&>a>div>div]:!w-full [&>a>div>div]:!h-full [&>a>div>div]:justify-center">
                 <VipButton text="All Discounts" href="/discounts" variant="sky" />
               </div>
             </div>
 
-            {/* Discounts Grid المحمل بالبيانات الحقيقية وبداخلها معرف الـ id الفريد والـ store بشكل فخم ومستقر */}
+            {/* Discounts Grid */}
             <DiscountsGrid discounts={latestDiscounts} />
           </div>
         </section>
@@ -207,13 +254,12 @@ export default async function Home() {
               <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter text-slate-900 uppercase leading-none">
                 Top <span className="text-sky-500 not-italic">Deals</span>
               </h2>
-              {/* تم تغيير variant هنا لـ orange ليتناسب مع القسم الأصفر والبرتقالي ويمنع خطأ الـ Typescript */}
               <div className="w-full sm:w-56 h-14 flex [&>a]:w-full [&>a]:h-full [&>a>div]:!w-full [&>a>div>div]:!w-full [&>a>div>div]:!h-full [&>a>div>div]:justify-center">
                 <VipButton text="All Deals" href="/deals" variant="orange" />
               </div>
             </div>
 
-            {/* تم استبدال حاوية الاختبار الفارغة واستدعاء شبكة العروض وتغذيتها بالمؤشرات التجريبية الحية */}
+            {/* Deals Grid */}
             <DealsGrid deals={latestDeals} />
           </div>
         </section>

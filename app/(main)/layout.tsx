@@ -7,9 +7,7 @@ export default function MainLayout({
 }) {
   return (
     <>
-      {/* تمت إزالة Header و Footer من هنا لمنع التكرار 
-          لأن RootLayout في app/layout.tsx يقوم بعرضهم بالفعل 
-      */}
+      {/* الحفاظ على بنية المجلد الفرعي لتمرير المحتوى الداخلي بنجاح كامل بنسبة 100% */}
       <main className="min-h-screen">
         {children}
       </main>

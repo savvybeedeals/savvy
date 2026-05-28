@@ -1,10 +1,8 @@
-"use client";
-
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google"; 
 import "./globals.css";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
-import { usePathname } from "next/navigation";
 import { AuthProvider } from "@/context/auth-context";
 
 // إعداد الخطوط لضمان مظهر احترافي ومتناسق لمشروع Savvy Bee
@@ -18,16 +16,79 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// [SEO 2026] ضبط الـ Viewport لضمان سرعة الاستجابة وإمكانية الوصول الكاملة
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5, 
+};
+
+// [SEO 2026] كائن الـ Metadata العالمي المتكامل والمضبوط برمجياً لموقع Savvy Bee Deals
+export const metadata: Metadata = {
+  metadataBase: new URL("https://savvybeedeals.com"), 
+  
+  title: {
+    template: "%s | Savvy Bee Deals",
+    default: "Savvy Bee Deals | Best Coupons, Promo Codes & Discounts", 
+  },
+  description: "Save money with the best coupons, promo codes, discount vouchers, and daily deals from top brands globally at Savvy Bee Deals.",
+  
+  keywords: [
+    "coupons", "promo codes", "discount vouchers", "daily deals", 
+    "online shopping offers", "save money", "best discounts 2026",
+    "Amazon coupons", "Walmart promo codes", "verified discount codes"
+  ],
+
+  authors: [{ name: "Savvy Bee Deals Team" }],
+  
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://savvybeedeals.com",
+    siteName: "Savvy Bee Deals",
+    title: "Savvy Bee Deals | Best Coupons, Promo Codes & Discounts",
+    description: "Save money with the best coupons, promo codes, discount vouchers, and daily deals from top brands globally.",
+    images: [
+      {
+        url: "/images/og-default.jpg", 
+        width: 1200,
+        height: 630,
+        alt: "Savvy Bee Deals - Your Ultimate Coupon & Promo Codes Platform",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Savvy Bee Deals | Best Coupons, Promo Codes & Discounts",
+    description: "Save money with the best coupons, promo codes, and daily deals from top brands.",
+    images: ["/images/og-default.jpg"],
+    creator: "@SavvyBeeDeals",
+  },
+
+icons: {
+  icon: "/favicon.ico",
+  apple: "/apple-touch-icon.png", 
+},};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  
-  // التعديل: التحقق إذا كان المسار يبدأ بـ /admin ليتوافق مع مجلد app/admin
-  const isStudio = pathname?.startsWith("/admin");
-
   return (
     <html 
       lang="en" 
@@ -41,17 +102,15 @@ export default function RootLayout({
       >
         {/* تغليف الموقع بالكامل بـ AuthProvider الخاص بـ Supabase لمراقبة فك الكوبونات */}
         <AuthProvider>
-          {/* 1. الهيدر: يظهر فقط في صفحات المستخدم العادي ولا يظهر في Sanity Studio */}
-          {!isStudio && <Header />} 
+          {/* الهيدر والفوتر يعملان هنا بشكل طبيعي على كامل الموقع مع فحص داخلي لـ /admin لضمان استقرار التصميم */}
+          <Header /> 
 
-          {/* 2. محتوى الصفحات المتغير (Main Content) */}
-          {/* تم استخدام flex-grow لضمان بقاء الفوتر في الأسفل دائماً */}
+          {/* محتوى الصفحات المتغير (Main Content) */}
           <main className="flex-grow">
             {children}
           </main>
 
-          {/* 3. الفوتر: يظهر فقط في صفحات المستخدم العادي */}
-          {!isStudio && <Footer />}
+          <Footer />
         </AuthProvider>
       </body>
     </html>
