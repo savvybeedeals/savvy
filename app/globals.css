@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* تكييف الألوان لتناسب الهوية البصرية Savvy Bee */
+  --color-primary: #FFD700;       /* Golden Yellow */
+  --color-secondary: #0ea5e9;     /* Sky Blue */
+  --color-accent: #333333;        /* Dark Grey/Black */
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  
+  /* تحسين سلاسة التمرير */
+  scroll-behavior: smooth;
+}
+
+/* في حال أردت دعم الوضع الليلي مستقبلاً، سنبقي عليه نظيفاً */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff; /* حالياً سنثبت الأبيض ليكون شكل الكوبونات احترافي */
+    --foreground: #171717;
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    @apply antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  }
+}
+
+@layer utilities {
+  /* إخفاء شريط التمرير مع الحفاظ على الوظيفة (مفيد للـ Nav في الموبايل) */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* تأثير Gradient خفيف للخلفيات */
+  .bg-subtle-gradient {
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  }
+
+  /* كلاس لتأثيرات الظل الناعمة التي ظهرت في التصميم */
+  .shadow-soft {
+    box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* تخصيص الـ Selection (لما المستخدم يحدد نص) */
+::selection {
+  background-color: #FFD700;
+  color: #000;
+}
