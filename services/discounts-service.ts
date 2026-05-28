@@ -23,6 +23,8 @@ export interface DiscountItem {
   usersCount: number;
   _createdAt?: string;
   createdAt?: string;
+  // التعديل المطلوب: إضافة خانة الـ discountSlug للـ Interface
+  discountSlug?: string;
 }
 
 /**
@@ -51,7 +53,8 @@ export async function getLatestDiscounts(): Promise<DiscountItem[]> {
     description,
     affiliateLink,
     usersCount,
-    _createdAt
+    _createdAt,
+    "discountSlug": slug.current
   }`;
 
   try {
@@ -90,7 +93,8 @@ export async function getAllDiscounts(): Promise<DiscountItem[]> {
     description,
     affiliateLink,
     usersCount,
-    _createdAt
+    _createdAt,
+    "discountSlug": slug.current
   }`;
 
   try {

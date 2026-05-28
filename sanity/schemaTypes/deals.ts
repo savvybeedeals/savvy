@@ -14,6 +14,23 @@ export default {
       validation: (Rule: any) => Rule.required(),
     },
     {
+      name: 'slug',
+      title: 'Slug URL',
+      type: 'slug',
+      description: 'الرابط الفريد لصفحة العرض. اضغط على Generate لتوليده تلقائياً من العنوان',
+      options: {
+        source: 'title',
+        maxLength: 96,
+        slugify: (input: string) =>
+          input
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-') // استبدال المسافات بشرطات
+            .replace(/[^\w\-]+/g, '') // إزالة الرموز الخاصة غير المتوافقة مع الروابط
+      },
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
       name: 'secondTitle',
       title: 'Second Title',
       type: 'string',

@@ -114,3 +114,34 @@ export async function saveUserCoupon(userId: string, couponId: string) {
     return { success: false };
   }
 }
+
+// 🔥 الدالة الجديدة لجلب الكوبون الفردي عن طريق الـ Slug الخاص به من أجل الـ SEO والصفحة المنفردة
+export async function getCouponBySlug(slug: string) {
+  const query = `*[_type == "coupon" && slug.current == $slug][0] {
+    _id,
+    title,
+    description,
+    discount,
+    code,
+    expiryDate,
+    "slug": slug.current,
+    "isVip": couponType == "vip",
+    affiliateUrl,
+    type,
+    rating,
+    reviewsCount,
+    usersCount,
+    store->{
+      name,
+      logo,
+      slug
+    }
+  }`;
+  try {
+    const coupon = await client.fetch(query, { slug });
+    return coupon;
+  } catch (error) {
+    console.error(`Error fetching coupon with slug ${slug}:`, error);
+    return null;
+  }
+}

@@ -25,6 +25,7 @@ export default function DiscountsPage() {
         const itemsQuery = `*[_type == "discount"] | order(_createdAt desc) {
           _id,
           name,
+          slug,
           description,
           productImage,
           oldPrice,

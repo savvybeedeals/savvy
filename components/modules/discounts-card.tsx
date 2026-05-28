@@ -43,6 +43,7 @@ interface DiscountItem {
   affiliateLink: string;
   usersCount: number;
   discountPercentageString?: string; // خانة جاهزة للربط المباشر مع سانتي (Sanity) مثل الكوبونات
+  slug?: { current: string }; // إضافة حقل الـ slug للربط الديناميكي للمسار الجديد
 }
 
 interface DiscountsCardProps {
@@ -129,6 +130,9 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
     }, 800);
   };
 
+  // استخراج رابط الـ Slug الفردي بشكل آمن تماماً
+  const discountSlug = discount.slug?.current || discount._id;
+
   return (
     <>
       {/* الكارت الخارجي مع أنيميشن أنعم عالي المرونة - تم تعديل الخلفية لتصبح #F5F6F7 بناءً على طلبك */}
@@ -191,9 +195,16 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
               </span>
             </div>
           </div>
-          <h4 className="font-[900] text-xl text-gray-900 mb-4 line-clamp-1 group-hover:text-sky-600 transition-colors">
-            {discount.name}
-          </h4>
+          {/* تحويل العنوان إلى رابط ديناميكي مستقل يدعم الـ SEO الفردي وممتاز للـ Crawlers */}
+          <Link 
+            href={`/discounts/${discountSlug}`}
+            onClick={(e) => e.stopPropagation()} 
+            className="block"
+          >
+            <h4 className="font-[900] text-xl text-gray-900 mb-4 line-clamp-1 hover:text-sky-600 transition-colors">
+              {discount.name}
+            </h4>
+          </Link>
         </div>
 
         {/* الأسعار وزر الإجراء السريع - تم تعديل ألوان السعر القديم والجديد بدقة والأزرار لتطابق طلبك */}
@@ -272,7 +283,7 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
                   </div>
                 )}
 
-                {/* حاوية الصورة (تكبير الكونتينر لعرض أكبر للصورة مع توافق استجابة الشاشات - تم الإبقاء على زر التكبير هنا في الـ Popup كما طلبت) */}
+                {/* حاوية الصورة (تكبير الكونتينر لعرض أكبر للصورة مع توافق استجابة الشاشات) */}
                 <div className="group/img relative w-full aspect-square md:aspect-auto md:h-[450px] lg:h-[500px] bg-white rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center shadow-xl border border-gray-50 overflow-hidden select-none">
                   {discount.productImage && (
                     <>
@@ -295,7 +306,7 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
                           <Maximize2 size={24} />
                         </div>
                       </button>
-                    </                    >
+                    </>
                   )}
                 </div>
               </div>

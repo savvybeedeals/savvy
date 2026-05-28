@@ -1,5 +1,5 @@
 import { client } from "@/services/client";
-import { supabase } from "@/lib/supabase"; // 🔥 إضافة استيراد عميل Supabase هنا
+import { supabase } from "@/lib/supabase";
 
 // دالة جلب جميع العروض المتاحة مرتبة من الأحدث للأقدم
 export async function getAllDeals() {
@@ -15,22 +15,59 @@ export async function getAllDeals() {
     type,
     rating,
     usersCount,
+    "slug": slug.current,
     store->{
       name,
       logo,
-      slug
+      "slug": slug.current
     },
     category->{
       name,
-      slug
+      "slug": slug.current
     }
   }`;
   try {
-    const deals = await client.fetch(query);
+    const deals = await client.fetch(query, {}, { next: { revalidate: 0 } });
     return deals || [];
   } catch (error) {
     console.error("Error fetching deals:", error);
     return [];
+  }
+}
+
+// جلب عرض واحد فريد بواسطة الـ Slug الخاص به لدعم صفحة الـ Deal الفردية
+export async function getDealBySlug(slug: string) {
+  if (!slug) return null;
+  
+  const query = `*[_type == "deal" && slug.current == $slug][0] {
+    _id,
+    title,
+    description,
+    secondTitle,
+    expiryDate,
+    "isVip": dealType == "vip",
+    affiliateUrl,
+    type,
+    rating,
+    usersCount,
+    "slug": slug.current,
+    store->{
+      name,
+      logo,
+      "slug": store->slug.current
+    },
+    category->{
+      name,
+      "slug": category->slug.current
+    }
+  }`;
+  try {
+    // إيقاف الكاش أثناء جلب الصفحات الفردية للتجربة الحية الفورية revalidate: 0
+    const deal = await client.fetch(query, { slug }, { next: { revalidate: 0 } });
+    return deal;
+  } catch (error) {
+    console.error("Error fetching deal by slug:", error);
+    return null;
   }
 }
 
@@ -51,11 +88,11 @@ export async function getLatestDeals() {
     store->{
       name,
       logo,
-      slug
+      "slug": slug.current
     },
     category->{
       name,
-      slug
+      "slug": slug.current
     }
   }`;
   try {
@@ -67,7 +104,7 @@ export async function getLatestDeals() {
   }
 }
 
-// دالة تحديث إحصائيات العروض (الزيارات عند الضغط أو التقييم) عبر الـ API المخصص لها
+// دالة تحديث إحصائيات العروض
 export async function updateDealStats(dealId: string, type: 'usage' | 'rating', ratingValue?: number) {
   try {
     const res = await fetch('/api/deals/update-stats', {
@@ -89,10 +126,9 @@ export async function updateDealStats(dealId: string, type: 'usage' | 'rating', 
   }
 }
 
-// 🔥 التعديل الجديد: دالة حفظ العرض في بروفايل المستخدم
+// دالة حفظ العرض في بروفايل المستخدم
 export async function saveUserDeal(userId: string, dealId: string) {
   try {
-    // الحصول على التوكن (JWT) للمستخدم الحالي لإثبات هويته للسيرفر وتخطي الـ RLS
     const { data: { session } } = await supabase.auth.getSession();
     const token = session?.access_token;
 
@@ -100,7 +136,6 @@ export async function saveUserDeal(userId: string, dealId: string) {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        // إرسال التوكن في الـ Headers إذا كان موجوداً
         ...(token ? { 'Authorization': `Bearer ${token}` } : {}) 
       },
       body: JSON.stringify({ userId, dealId }),

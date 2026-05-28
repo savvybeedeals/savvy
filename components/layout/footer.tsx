@@ -2,14 +2,21 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Mail, MapPin, Phone, Send, Globe, Heart, ShieldCheck } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const pathname = usePathname(); // جلب المسار الحالي برمجياً لفحصه
+
+  // حظر الفوتر برمجياً من الظهور تماماً إذا كان المستخدم داخل مسار الداشبورد /admin
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <footer className="bg-[#1A1A1A] text-gray-300 font-sans mt-10" aria-label="Site Footer">
-      {/* 1. الجزء العلوي: تم تقليل py من 12 إلى 6 لتصغير المسافة */}
+      {/* 1. الجزء العلوي */}
       <div className="border-b border-gray-800/50">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="max-w-md text-center md:text-left">
@@ -33,7 +40,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* 2. الجزء الأوسط: تم تقليل py من 16 إلى 8 وتقليل الـ gap بين الأعمدة */}
+      {/* 2. الجزء الأوسط */}
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         
         {/* العمود الأول: عن الموقع */}
@@ -104,7 +111,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* 3. الجزء السفلي: تم تقليل py من 8 إلى 4 */}
+      {/* 3. الجزء السفلي */}
       <div className="border-t border-gray-800/30 py-4 bg-[#151515]">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] uppercase tracking-widest text-gray-500 font-bold">
           <p>© {currentYear} Savvy Bee Deals. All rights reserved.</p>
@@ -113,10 +120,9 @@ const Footer = () => {
               <Heart className="w-3 h-3 text-red-500 fill-red-500" aria-hidden="true" />
               <span>For Shoppers</span>
             </div>
-            <div className="h-3 w-px bg-gray-800" aria-hidden="true"></div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-3 h-3 text-sky-500" aria-hidden="true" />
-              <span>SSL Secured</span>
+            <div className="flex items-center gap-1.5 text-emerald-500 font-black">
+              <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>100% Verified Coupons</span>
             </div>
           </div>
         </div>

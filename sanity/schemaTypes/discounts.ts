@@ -14,6 +14,19 @@ export const discountsSchema = defineType({
       validation: (Rule) => Rule.required().min(3).max(100),
     }),
 
+    // حقل الـ Slug المضاف حديثاً لتوليد روابط URL ديناميكية متوافقة مع الـ SEO
+    defineField({
+      name: "slug",
+      title: "Slug (URL)",
+      type: "slug",
+      description: "الرابط الفريد لصفحة الخصم (اضغط على Generate لإنشائه تلقائياً من اسم المنتج)",
+      options: {
+        source: "name",
+        maxLength: 96,
+      },
+      validation: (Rule) => Rule.required().error("الـ Slug مطلوب لإنشاء صفحة منفردة متوافقة مع محركات البحث"),
+    }),
+
     // 2. Product Short Description
     defineField({
       name: "description",

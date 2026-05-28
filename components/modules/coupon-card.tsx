@@ -14,6 +14,7 @@ interface CouponProps {
     title: string;
     code: string;
     discount: string;
+    slug?: string; // 🔥 إضافة الـ Slug هنا لدعم الانتقال للصفحة المنفردة وأرشفة الـ SEO
     expiryDate?: string;
     isVip?: boolean;
     affiliateUrl?: string;
@@ -35,6 +36,7 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
     title,
     code,
     discount,
+    slug, // 🔥 استخراج الـ Slug
     expiryDate,
     isVip,
     affiliateUrl = "#",
@@ -93,6 +95,9 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
 
   const storeName = store?.name || "Store";
   const storeSlug = store?.slug?.current || "";
+
+  // إعداد مسار الصفحة المنفردة للكوبون بناءً على الـ Slug
+  const couponPageUrl = slug ? `/coupons/${slug}` : `#`;
 
   return (
     <>
@@ -155,9 +160,13 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
               </div>
             </div>
           </div>
+          
           {/* Increased title size from text-[15px] to text-[15px] */}
-          <h3 className="text-[15px] font-bold text-gray-700 leading-tight line-clamp-2 group-hover:text-black transition-colors">
-            {title}
+          {/* 🔥 تحويل العنوان إلى رابط لتهيئة محركات البحث وجوجل للأرشفة الذاتية */}
+          <h3 className="text-[15px] font-bold text-gray-700 leading-tight line-clamp-2 group-hover:text-sky-600 transition-colors">
+            <Link href={couponPageUrl} className="hover:underline">
+              {title}
+            </Link>
           </h3>
           
           <div className="flex flex-wrap items-center gap-2.5 mt-3 pt-3 border-t border-gray-50">

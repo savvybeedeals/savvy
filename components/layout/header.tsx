@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Globe, User, ChevronDown, Flame, Ticket, Tag, TrendingDown, LogOut, ChevronRight, Settings, Shield, FileText, HelpCircle, Store, Menu, Smartphone } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/auth-context'; 
 import { getCategoriesTree } from '@/services/category-service';
@@ -24,13 +24,13 @@ const Header = () => {
   const [dynamicOffers, setDynamicOffers] = useState<Array<{ id: string | number, text: string, link: string }>>(DEFAULT_OFFERS);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // حالة التحكم في منيو الموبايل
   
   // الحالات الجديدة المضافة لإدارة روابط التطبيق من سانتي
   const [appLinks, setAppLinks] = useState<{ googlePlay?: string; appStore?: string } | null>(null);
 
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const pathname = usePathname(); // جلب المسار الحالي برمجياً لفحصه
   const { user, logout } = useAuth();
 
   const displayName = user?.user_metadata?.first_name || user?.user_metadata?.name || user?.email?.split('@')[0] || "Account";
@@ -81,7 +81,6 @@ const Header = () => {
   useEffect(() => {
     const fetchAppLinks = async () => {
       try {
-        // يتم الاستعلام عن أول وثيقة تحتوي على إعدادات الروابط أو إعدادات الموقع العامة
         const data = await client.fetch(`*[_type in ["appSettings", "siteSettings", "siteConfig"]][0]{
           googlePlay,
           appStore
@@ -124,6 +123,11 @@ const Header = () => {
       router.push(`/search?q=${encodeURIComponent(trimmedQuery.toLowerCase())}`);
     }
   };
+
+  // حظر الهيدر برمجياً من الظهور تماماً إذا كان المستخدم داخل مسار الداشبورد /admin
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <div className="w-full">
@@ -259,7 +263,7 @@ const Header = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Hamburger Button for Mobile Menu (Positioned aligned next to the gear icon) */}
+                {/* Hamburger Button for Mobile Menu */}
                 <motion.button 
                   onClick={() => setIsMobileMenuOpen(true)} 
                   animate={{ scale: [1, 1.06, 1] }}
@@ -273,7 +277,6 @@ const Header = () => {
               </div>
             ) : (
               <div className="flex items-center gap-3 sm:gap-4">
-                {/* زر موحد ونظيف لتسجيل الدخول يدخل مباشرة على صفحة اللوجن */}
                 <Link 
                   href="/login" 
                   className="bg-[#333333] text-white px-5 sm:px-6 py-2.5 rounded-full font-black hover:bg-black transition-all shadow-md flex items-center gap-2 text-xs sm:text-sm active:scale-95"
@@ -282,7 +285,7 @@ const Header = () => {
                   <span>Sign In</span>
                 </Link>
 
-                {/* Hamburger Button for Mobile Menu (Fallback when user is logged out) */}
+                {/* Hamburger Button for Mobile Menu */}
                 <motion.button 
                   onClick={() => setIsMobileMenuOpen(true)} 
                   animate={{ scale: [1, 1.06, 1] }}
@@ -404,8 +407,6 @@ const Header = () => {
               {/* Get Our App Dropdown */}
               <div className="relative group pb-2 -mb-2 ml-auto">
                  <motion.button 
-                   animate={{ scale: [1, 1.02, 1] }}
-                   transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
                    whileHover={{ scale: 1.05 }}
                    whileTap={{ scale: 0.98 }}
                    className="flex items-center gap-1.5 text-sky-600 hover:text-sky-700 transition-colors py-1.5 px-3.5 font-black border border-sky-200 hover:border-sky-400 bg-sky-50/30 hover:bg-sky-50 rounded-full shadow-sm"

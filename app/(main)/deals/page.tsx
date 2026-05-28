@@ -2,6 +2,7 @@ import { getAllDeals } from "@/services/deals-service";
 import { DealsGrid } from "@/components/collections/deals-grid";
 import { ShoppingCart } from "lucide-react";
 
+// الحفاظ على الـ Metadata الأصلية كاملة لتحسين الـ SEO الخاص بالصفحة الرئيسية لقسم العروض
 export const metadata = {
   title: "All Deals & Discounts | Savvy Bee Deals",
   description: "Browse the latest verified product discounts, price drops, and exclusive deals from top international brands.",

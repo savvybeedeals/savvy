@@ -14,6 +14,17 @@ export default {
       validation: (Rule: any) => Rule.required(),
     },
     {
+      name: 'slug',
+      title: 'Slug (URL)',
+      type: 'slug',
+      description: 'اضغط على Generate لتوليد رابط الكوبون تلقائياً بناءً على العنوان للـ SEO',
+      options: {
+        source: 'title',
+        maxLength: 96,
+      },
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
       name: 'description',
       title: 'Coupon Description',
       type: 'text',
