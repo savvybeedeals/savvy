@@ -1,5 +1,3 @@
-
-```
 savvy-code
 ├─ AGENTS.md
 ├─ app
