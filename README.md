@@ -25,6 +25,7 @@ savvy-code
 │  │  │  └─ [dealsslug]
 │  │  │     └─ page.tsx
 │  │  ├─ discounts
+│  │  │  ├─ DiscountsPageClient.tsx
 │  │  │  ├─ page.tsx
 │  │  │  └─ [discountSlug]
 │  │  │     └─ page.tsx

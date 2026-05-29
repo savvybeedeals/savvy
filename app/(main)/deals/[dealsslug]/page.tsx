@@ -55,13 +55,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!deal) {
     return {
-      title: "Deal Not Found | Savvy Bee",
+      title: "Deal Not Found | Savvy Bee Deals 🍯",
       description: "Sorry, this product deal is currently unavailable or has expired.",
     };
   }
 
   const storeName = deal.store?.name || "Partner Store";
-  const pageTitle = `${deal.title} - ${storeName} Exclusive Deal | Savvy Bee`;
+  const pageTitle = `${deal.title} - ${storeName} Exclusive Deal | Savvy Bee Deals 🍯`;
   const pageDescription = deal.description || `Get the best price drop on ${deal.title} at ${storeName}. Verified and tested product deal available now.`;
 
   return {
@@ -111,28 +111,61 @@ export default async function DealSlugPage({ params }: Props) {
     rating: deal.rating,
   };
 
+  // بناء بيانات الـ Schema المهيكلة للعرض لربط السعر والخصم بجوجل مباشرة
+  const jsonLdSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": deal.title,
+    "description": deal.description || `Exclusive deal and price drop from ${deal.store?.name || 'Partner Store'}.`,
+    "image": deal.store?.logo || "https://savvybeedeals.com/favicon.ico",
+    "offers": {
+      "@type": "Offer",
+      "price": "0", // يمكنك ربط السعر الحقيقي هنا إذا توفر في المستقبل ببيانات الـ deal
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "validThrough": deal.expiryDate || undefined,
+      "seller": {
+        "@type": "Organization",
+        "name": deal.store?.name || "Savvy Bee Deals"
+      }
+    },
+    "aggregateRating": deal.rating ? {
+      "@type": "AggregateRating",
+      "ratingValue": deal.rating,
+      "reviewCount": deal.usersCount || 10
+    } : undefined
+  };
+
   return (
-    <main className="min-h-screen bg-[#F8F9FA] py-12 px-4 md:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        
-        {/* العناوين والشارات العلوية المخصصة للمظهر والدعم البرمجي */}
-        <div className="text-center space-y-2">
-          <span className="text-xs font-black text-amber-600 uppercase tracking-[0.2em] bg-amber-50 px-4 py-1.5 rounded-full border border-amber-100 inline-block">
-            Verified Product Deal
-          </span>
-          <h1 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight">
-            {deal.title}
-          </h1>
-        </div>
+    <>
+      {/* حقن الـ Structured Data من السيرفر مباشرة لصفحة الـ Deals */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSchema) }}
+      />
 
-        {/* الحاوية الموحدة لعرض الكارت بالأبعاد القياسية المستقرة والمحاذية للمنتصف */}
-        <div className="flex justify-center items-center w-full">
-          <div className="w-full max-w-4xl transition-all duration-300">
-            <DealCard {...cardProps} />
+      <main className="min-h-screen bg-[#F8F9FA] py-12 px-4 md:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto space-y-8">
+          
+          {/* العناوين والشارات العلوية المخصصة للمظهر والدعم البرمجي */}
+          <div className="text-center space-y-2">
+            <span className="text-xs font-black text-amber-600 uppercase tracking-[0.2em] bg-amber-50 px-4 py-1.5 rounded-full border border-amber-100 inline-block">
+              Verified Product Deal
+            </span>
+            <h1 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight">
+              {deal.title}
+            </h1>
           </div>
-        </div>
 
-      </div>
-    </main>
+          {/* الحاوية الموحدة لعرض الكارت بالأبعاد القياسية المستقرة والمحاذية للمنتصف */}
+          <div className="flex justify-center items-center w-full">
+            <div className="w-full max-w-4xl transition-all duration-300">
+              <DealCard {...cardProps} />
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </>
   );
 }

@@ -49,13 +49,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!discount) {
     return {
-      title: "Discount Not Found | Savvy Bee",
+      title: "Discount Not Found | Savvy Bee Deals 🍯",
       description: "Sorry, this limited-time flash discount is currently unavailable or has expired.",
     };
   }
 
   const storeName = discount.store?.name || "Store";
-  const pageTitle = `${discount.name} - ${storeName} Verified Deal | Savvy Bee`;
+  const pageTitle = `${discount.name} - ${storeName} Verified Deal | Savvy Bee Deals 🍯`;
   const pageDescription = discount.description || `Save big with our verified ${storeName} price drop. Get ${discount.name} at the lowest price today.`;
 
   return {
@@ -84,28 +84,67 @@ export default async function DiscountSlugPage({ params }: Props) {
     notFound();
   }
 
+  // بناء بيانات الـ Schema الفخمة لعرض الأسعار القديمة والجديدة مباشرة في جوجل (Rich Snippet Price)
+  const jsonLdSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": discount.name,
+    "description": discount.description || `Save ${discount.discountPercentage}% off on ${discount.name} at ${discount.store?.name || 'our partner store'}.`,
+    "image": discount.productImage || discount.store?.logo || "https://savvybeedeals.com/favicon.ico",
+    "offers": {
+      "@type": "Offer",
+      "price": discount.currentPrice || "0",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "validThrough": discount.expiryDate || undefined,
+      "priceSpecification": discount.oldPrice ? {
+        "@type": "PriceSpecification",
+        "price": discount.oldPrice,
+        "priceCurrency": "USD",
+        "valueAddedTaxIncluded": "false"
+      } : undefined,
+      "seller": {
+        "@type": "Organization",
+        "name": discount.store?.name || "Savvy Bee Deals"
+      }
+    },
+    "aggregateRating": discount.rating ? {
+      "@type": "AggregateRating",
+      "ratingValue": discount.rating,
+      "reviewCount": discount.usersCount || 15
+    } : undefined
+  };
+
   return (
-    <main className="min-h-screen bg-gray-50/50 py-12 px-4 md:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto space-y-8">
-        
-        {/* شارة علوية لتحسين الـ SEO الداخلي وتجربة المستخدم */}
-        <div className="text-center space-y-2">
-          <span className="text-sm font-semibold text-sky-500 uppercase tracking-wider bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
-            Limited Time Price Drop
-          </span>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-            {discount.name}
-          </h1>
-        </div>
+    <>
+      {/* حقن الـ Product & Price Schema من السيرفر مباشرة لصفحة الـ Discounts */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSchema) }}
+      />
 
-        {/* تعديل توحيد العرض: حاوية مرنة تمنع التمدد وتجعل الكارت بنفس أبعاده القياسية الأصلية في المنتصف */}
-        <div className="flex justify-center items-center">
-          <div className="w-full max-w-[380px] bg-[#F5F6F7] rounded-[2.5rem] shadow-sm border border-gray-100 p-2 transition-all duration-300 hover:shadow-md">
-            <DiscountsCard discount={discount} />
+      <main className="min-h-screen bg-gray-50/50 py-12 px-4 md:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto space-y-8">
+          
+          {/* شارة علوية لتحسين الـ SEO الداخلي وتجربة المستخدم */}
+          <div className="text-center space-y-2">
+            <span className="text-sm font-semibold text-sky-500 uppercase tracking-wider bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
+              Limited Time Price Drop
+            </span>
+            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+              {discount.name}
+            </h1>
           </div>
-        </div>
 
-      </div>
-    </main>
+          {/* تعديل توحيد العرض: حاوية مرنة تمنع التمدد وتجعل الكارت بنفس أبعاده القياسية الأصلية في المنتصف */}
+          <div className="flex justify-center items-center">
+            <div className="w-full max-w-[380px] bg-[#F5F6F7] rounded-[2.5rem] shadow-sm border border-gray-100 p-2 transition-all duration-300 hover:shadow-md">
+              <DiscountsCard discount={discount} />
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </>
   );
 }

@@ -49,6 +49,50 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 // المكون الرئيسي السيرفر الذي يمرر الـ params إلى الـ Client Component بأمان تامة للتوافق مع Next.js 15
-export default function StorePage({ params }: PageProps) {
-  return <StorePageClient params={params} />;
+export default async function StorePage({ params }: PageProps) {
+  const resolvedParams = await params;
+  const storeSlug = resolvedParams.storeSlug;
+  
+  // جلب بيانات المتجر على السيرفر لبناء الـ ItemList سكيما بشكل نظيف وديناميكي
+  let store: any = null;
+  try {
+    store = await getStoreBySlug(storeSlug);
+  } catch (e) {
+    console.error("Error fetching store for schema:", e);
+  }
+
+  // إذا لم يكن المتجر موجوداً، نترك التعامل معه للـ Client Component أو الـ Metadata، 
+  // وإذا وجدناه نقوم ببناء سكيما الـ ItemList لجميع العروض (الكوبونات أو الخصومات الملحقة به)
+  const itemListSchema = store ? {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": `${store.name} Promo Codes & Coupons`,
+    "description": `List of active and verified coupons, promo codes, and discounts for ${store.name}.`,
+    "numberOfItems": store.coupons?.length || 0,
+    "itemListElement": (store.coupons || []).map((coupon: any, index: number) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Coupon",
+        "name": coupon.title || coupon.name || `${store.name} Coupon`,
+        "description": coupon.description || `Verified promo code for ${store.name}`,
+        "provider": {
+          "@type": "Organization",
+          "name": store.name
+        }
+      }
+    }))
+  } : null;
+
+  return (
+    <>
+      {itemListSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+        />
+      )}
+      <StorePageClient params={params} />
+    </>
+  );
 }
