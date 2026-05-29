@@ -1,10 +1,9 @@
 import { client } from "@/services/client";
-import { supabase } from "@/lib/supabase"; // 🔥 إضافة استيراد عميل Supabase هنا
+import { supabase } from "@/lib/supabase";
 
 // دالة جلب جميع البيانات
 export async function getAllCoupons() {
-  const query = `*[_type == "coupon"] |
-  order(_createdAt desc) {
+  const query = `*[_type == "coupon"] | order(_createdAt desc) {
     _id,
     title,
     description,
@@ -24,7 +23,8 @@ export async function getAllCoupons() {
     }
   }`;
   try {
-    const coupons = await client.fetch(query);
+    // 🔥 تفعيل الـ ISR باستخدام الـ tags لربطها بالـ Webhook
+    const coupons = await client.fetch(query, {}, { next: { tags: ['coupons'] } });
     return coupons;
   } catch (error) {
     console.error("Error fetching coupons:", error);
@@ -34,8 +34,7 @@ export async function getAllCoupons() {
 
 // دالة جلب آخر 4 كوبونات فقط للصفحة الرئيسية
 export async function getLatestCoupons() {
-  const query = `*[_type == "coupon"] |
-  order(_createdAt desc)[0...4] {
+  const query = `*[_type == "coupon"] | order(_createdAt desc)[0...4] {
     _id,
     title,
     description,
@@ -55,7 +54,8 @@ export async function getLatestCoupons() {
     }
   }`;
   try {
-    const coupons = await client.fetch(query);
+    // 🔥 تفعيل الـ ISR هنا أيضاً لضمان سرعة الصفحة الرئيسية وتحديثها الفوري
+    const coupons = await client.fetch(query, {}, { next: { tags: ['coupons'] } });
     return coupons;
   } catch (error) {
     console.error("Error fetching latest coupons:", error);
@@ -71,7 +71,7 @@ export async function updateCouponStats(couponId: string, type: 'usage' | 'ratin
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ couponId, type, ratingValue }),
     });
-    // التحقق من أن الاستجابة JSON وليست HTML خطأ
+    
     if (!res.ok) {
         const errorText = await res.text();
         console.error('Server error response:', errorText);
@@ -88,7 +88,7 @@ export async function updateCouponStats(couponId: string, type: 'usage' | 'ratin
 // دالة حفظ الكوبون في بروفايل المستخدم
 export async function saveUserCoupon(userId: string, couponId: string) {
   try {
-    // 🔥 التعديل الجديد: الحصول على التوكن (JWT) للمستخدم الحالي لإثبات هويته للسيرفر
+    // الحصول على التوكن (JWT) للمستخدم الحالي لإثبات هويته للسيرفر
     const { data: { session } } = await supabase.auth.getSession();
     const token = session?.access_token;
 
@@ -101,7 +101,6 @@ export async function saveUserCoupon(userId: string, couponId: string) {
       },
       body: JSON.stringify({ userId, couponId }),
     });
-    
     if (!res.ok) {
         const errorText = await res.text();
         console.error('Server error response:', errorText);
@@ -115,7 +114,7 @@ export async function saveUserCoupon(userId: string, couponId: string) {
   }
 }
 
-// 🔥 الدالة الجديدة لجلب الكوبون الفردي عن طريق الـ Slug الخاص به من أجل الـ SEO والصفحة المنفردة
+// الدالة الجديدة لجلب الكوبون الفردي عن طريق الـ Slug الخاص به من أجل الـ SEO والصفحة المنفردة
 export async function getCouponBySlug(slug: string) {
   const query = `*[_type == "coupon" && slug.current == $slug][0] {
     _id,
@@ -138,10 +137,11 @@ export async function getCouponBySlug(slug: string) {
     }
   }`;
   try {
-    const coupon = await client.fetch(query, { slug });
+    // 🔥 تفعيل الـ ISR لصفحة الكوبون الفردية لأرشفة فائقة وسرعة TTFB قصوى
+    const coupon = await client.fetch(query, { slug }, { next: { tags: ['coupons'] } });
     return coupon;
   } catch (error) {
     console.error(`Error fetching coupon with slug ${slug}:`, error);
     return null;
   }
-}
+} // <--- تم التعديل هنا بإزالة القوس الزائد )

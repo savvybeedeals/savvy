@@ -23,19 +23,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // إنشاء عميل Supabase مخصص لهذه العملية يحمل توكن المستخدم الحالي لتطبيق سياسات الـ RLS
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
     
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      global: {
-        headers: { Authorization: authHeader },
-      },
-    });
+    // 1. إنشاء عميل افتراضي للتحقق من التوكن فقط
+    const supabaseAuthClient = createClient(supabaseUrl, supabaseAnonKey);
 
     // الخطوة الثالثة: فك التوكن والتحقق من الهوية الفردية ومطابقة الـ IDs لمنع التلاعب بالخلفية
     const token = authHeader.split(' ')[1];
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const { data: { user }, error: authError } = await supabaseAuthClient.auth.getUser(token);
 
     if (authError || !user || user.id !== userId) {
       return NextResponse.json(
@@ -44,14 +40,17 @@ export async function POST(request: Request) {
       );
     }
 
-    // 🔥 الحل الثاني: استخدام .insert() التقليدي بدلاً من .upsert() لتتوافق تماماً مع سياسات الـ RLS الحالية
-    const { data, error } = await supabase
+    // 🔥 الـتـعـديـل الـجـوهـري: إنشاء عميل بصلاحيات الخدمة (Service Role) لتخطي الـ RLS بأمان داخل السيرفر
+    const supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+
+    // تنفيذ عملية الإدخال باستخدام عميل الأدمن الموثوق
+    const { data, error } = await supabaseAdmin
       .from('saved_discounts')
       .insert([{ user_id: userId, discount_id: discountId }])
       .select();
 
     if (error) {
-      // 🔥 إذا كان الخصم محفوظاً بالفعل في المفضلة، نتجاوز الخطأ بذكاء ونخبر الواجهة بنجاح العملية
+      // 🔥 إذا كان الخصم محفوظاً بالفعل في المفضلة (Unique Constraint Violation)، نتجاوز الخطأ بذكاء
       if (error.code === '23505') {
         return NextResponse.json({ success: true, message: 'Discount already saved' }, { status: 200 });
       }

@@ -44,17 +44,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // 🔥 الخطوة الثانية: الحفظ الآمن في جدول العروض الفعلي باستخدام الـ upsert لمنع تكرار البيانات هدوء
+    // 🔥 التعديل: استخدام insert بدلاً من upsert لتفادي شروط الـ RLS المعقدة في التحديث والتكرار
+    // إذا كان العرض محفوظاً مسبقاً، سيعود السيرفر بنجاح دون الحاجة لإعادة الكتابة
     const { data, error } = await supabase
       .from('saved_deals')
-      .upsert(
-        { user_id: userId, deal_id: dealId },
-        { onConflict: 'user_id,deal_id' }
-      )
+      .insert({ user_id: userId, deal_id: dealId })
       .select();
 
     if (error) {
-      console.error('Supabase upsert error:', error);
+      // إذا كان الخطأ بسبب تكرار المفتاح (العرض محفوظ مسبقاً)، نعتبرها عملية ناجحة
+      if (error.code === '23505') {
+        return NextResponse.json({ success: true, message: 'Deal already saved' });
+      }
+      
+      console.error('Supabase insert error:', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 

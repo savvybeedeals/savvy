@@ -111,29 +111,49 @@ export default async function DealSlugPage({ params }: Props) {
     rating: deal.rating,
   };
 
-  // بناء بيانات الـ Schema المهيكلة للعرض لربط السعر والخصم بجوجل مباشرة
+  const storeName = deal.store?.name || "Savvy Bee Deals";
+
+  // بناء بيانات الـ Schema المهيكلة المتقدمة لصفحات الـ Deals لانتزاع نجوم التقييم والعروض من جوجل مباشرة
   const jsonLdSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": deal.title,
-    "description": deal.description || `Exclusive deal and price drop from ${deal.store?.name || 'Partner Store'}.`,
+    "description": deal.description || `Exclusive deal and price drop from ${storeName}.`,
     "image": deal.store?.logo || "https://savvybeedeals.com/favicon.ico",
-    "offers": {
-      "@type": "Offer",
-      "price": "0", // يمكنك ربط السعر الحقيقي هنا إذا توفر في المستقبل ببيانات الـ deal
-      "priceCurrency": "USD",
-      "availability": "https://schema.org/InStock",
-      "validThrough": deal.expiryDate || undefined,
-      "seller": {
-        "@type": "Organization",
-        "name": deal.store?.name || "Savvy Bee Deals"
-      }
+    "brand": {
+      "@type": "Brand",
+      "name": storeName
     },
-    "aggregateRating": deal.rating ? {
-      "@type": "AggregateRating",
-      "ratingValue": deal.rating,
-      "reviewCount": deal.usersCount || 10
-    } : undefined
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "USD",
+      "lowPrice": "0",
+      "highPrice": "0",
+      "offerCount": "1",
+      "availability": "https://schema.org/InStock",
+      "url": `https://savvybeedeals.com/deals/${dealSlug}`,
+      "offers": [
+        {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "itemCondition": "https://schema.org/NewCondition",
+          "validThrough": deal.expiryDate ? new Date(deal.expiryDate).toISOString().split('T')[0] : undefined,
+          "seller": {
+            "@type": "Organization",
+            "name": storeName
+          }
+        }
+      ]
+    },
+    ...(deal.rating ? {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": deal.rating.toString(),
+        "reviewCount": deal.usersCount && deal.usersCount > 0 ? deal.usersCount.toString() : "10"
+      }
+    } : {})
   };
 
   return (

@@ -7,6 +7,8 @@ import {
   TrendingUp, CheckCircle2, Ticket, AlertCircle, Maximize2 
 } from 'lucide-react';
 import Link from 'next/link';
+// استيراد مكون Image من Next.js لمنع الـ CLS وتحسين الأداء 100%
+import Image from 'next/image';
 // استيراد الـ Auth Context لقراءة حالة تسجيل الدخول الحقيقية مثل الكوبونات
 import { useAuth } from "@/context/auth-context";
 // التعديل الصحيح: استخدام الـ named export لمنع تحذير الـ deprecation نهائياً
@@ -147,7 +149,7 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
       >
         {/* شارة الـ VIP */}
         {discount.isVip && (
-          <div className="absolute -top-3 -left-2 z-20 scale-75 origin-top-left">
+          <div className="absolute -top-3 -left-2 z-20 scale-75 origin-top-left w-[114px] h-[46px]">
             <div className="absolute inset-0 bg-[#FFD700] rounded-full blur-lg opacity-30 animate-pulse"></div>
             <div className="relative bg-[#FFD700] text-black px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 border-2 border-white overflow-hidden">
               <span className="text-base">🐝</span>
@@ -162,9 +164,9 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
 
         {/* شارة نسبة الخصم الذكية - تم تعديل التنسيق ليطابق تماماً شارة الـ VIP بالجلو الذهبي المحيط والأنيميشن الشيمر */}
         {displayDiscount && (
-          <div className="absolute top-4 right-4 z-20">
+          <div className="absolute top-4 right-4 z-20 min-w-[70px] h-[30px]">
             <div className="absolute inset-0 bg-[#FFD700] rounded-xl blur-md opacity-40 animate-pulse"></div>
-            <span className="relative bg-[#FFD700] text-black px-3 py-1 rounded-xl text-xs font-black tracking-tight shadow-md border-2 border-white block overflow-hidden">
+            <span className="relative bg-[#FFD700] text-black px-3 py-1 rounded-xl text-xs font-black tracking-tight shadow-md border-2 border-white block overflow-hidden text-center">
               {displayDiscount}
               <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12 animate-[shimmer_2s_infinite]"></div>
             </span>
@@ -172,12 +174,15 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
         )}
 
         {/* حاوية الصورة المحدثة لعرض صور سانتي بشكل متناسق وممتاز داخل الكارت (تم حذف زر التكبير الخارجي والاكتفاء بالصورة فقط) */}
-        <div className="group/imgContainer h-48 bg-white rounded-[2rem] flex items-center justify-center mb-6 relative overflow-hidden select-none shadow-sm">
+        <div className="group/imgContainer h-48 bg-white rounded-[2rem] flex items-center justify-center mb-6 relative overflow-hidden select-none shadow-sm w-full">
           <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/[0.02]"></div>
           {discount.productImage && (
-            <img 
+            <Image 
               src={urlFor(discount.productImage).url()} 
               alt={discount.name}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={true}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] z-10"
             />
           )}
@@ -187,10 +192,10 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-black text-sky-500 uppercase tracking-tighter">{renderStoreName()}</span>
-            <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-full">
-              <Star size={10} className="fill-amber-400 text-amber-400" />
+            <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-full h-[20px]">
+              <Star size={10} className="fill-amber-400 text-amber-400 shrink-0" />
               {/* التعديل الوقائي الأول: التحقق من وجود التقييم لمنع الخطأ في محرك البحث */}
-              <span className="text-[10px] font-bold text-amber-700">
+              <span className="text-[10px] font-bold text-amber-700 leading-none">
                 {discount.rating !== undefined && discount.rating !== null ? discount.rating.toFixed(1) : "0.0"}
               </span>
             </div>
@@ -215,7 +220,7 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
           </div>
           <button 
             onClick={handleOpenProduct}
-            className={`p-4 rounded-2xl transition-all shadow-lg active:scale-90 group/btn flex items-center justify-center
+            className={`p-4 rounded-2xl transition-all shadow-lg active:scale-90 group/btn flex items-center justify-center w-[54px] h-[54px] shrink-0
               ${discount.isVip ? 'bg-[#FFD700] hover:bg-black hover:text-[#FFD700] text-black' : 'bg-black text-white hover:bg-sky-500'}
             `}
           >
@@ -272,7 +277,7 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
                 
                 {/* عرض قيمة العرض بشكل واضح وممتاز أعلى حاوية الصورة مباشرة */}
                 {displayDiscount && (
-                  <div className="w-full flex justify-start mb-4 select-none">
+                  <div className="w-full flex justify-start mb-4 select-none h-[38px]">
                     <div className="relative">
                       <div className="absolute inset-0 bg-[#FFD700] rounded-xl blur-md opacity-40 animate-pulse"></div>
                       <span className="relative bg-[#FFD700] text-black px-4 py-2 rounded-xl text-xs md:text-sm font-black tracking-tight shadow-md border-2 border-white block overflow-hidden">
@@ -287,9 +292,11 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
                 <div className="group/img relative w-full aspect-square md:aspect-auto md:h-[450px] lg:h-[500px] bg-white rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center shadow-xl border border-gray-50 overflow-hidden select-none">
                   {discount.productImage && (
                     <>
-                      <img 
+                      <Image 
                         src={urlFor(discount.productImage).url()} 
                         alt={discount.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
                       />
                       {/* زر التكبير السلس عند تمرير الماوس فوق الصورة في الـ Popup */}
@@ -365,7 +372,7 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
                       Shop at {renderStoreName()} <ExternalLink size={16} />
                     </a>
 
-                    <div className="flex flex-col justify-center bg-amber-50/50 border border-amber-100 px-4 py-3 rounded-2xl">
+                    <div className="flex flex-col justify-center bg-amber-50/50 border border-amber-100 px-4 py-3 rounded-2xl min-h-[62px]">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-amber-800 font-black text-[10px] uppercase tracking-wider">
                           {userRating > 0 ? "Thanks for rating!" : "Did it work?"}
@@ -396,7 +403,7 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
 
                 {/* شريط الإحصائيات النهائي للتحقق الفوري أسفل الكارت */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] font-black text-gray-400 uppercase tracking-widest border-t border-gray-50 pt-4 mt-4 md:mt-auto">
-                   <div className="flex items-center gap-1.5 bg-green-50 text-green-600 px-2.5 py-1 rounded-full border border-green-100">
+                   <div className="flex items-center gap-1.5 bg-green-50 text-green-600 px-2.5 py-1 rounded-full border border-green-100 h-[22px]">
                       <CheckCircle2 size={12} />
                       Tested & Verified 2 hours ago
                    </div>
@@ -437,11 +444,15 @@ export function DiscountsCard({ discount }: DiscountsCardProps) {
               >
                 <X size={20} />
               </button>
-              <img 
-                src={urlFor(discount.productImage).url()} 
-                alt={discount.name}
-                className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/10"
-              />
+              <div className="relative max-w-full max-h-[85vh] w-[90vw] h-[80vh]">
+                <Image 
+                  src={urlFor(discount.productImage).url()} 
+                  alt={discount.name}
+                  fill
+                  sizes="90vw"
+                  className="object-contain rounded-2xl shadow-2xl border border-white/10"
+                />
+              </div>
             </motion.div>
           </div>
         )}

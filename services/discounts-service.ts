@@ -31,8 +31,7 @@ export interface DiscountItem {
  * جلب عروض الخصومات المحدودة (أول 4 فقط للـ Homepage)
  */
 export async function getLatestDiscounts(): Promise<DiscountItem[]> {
-  const query = `*[_type == "discount"] |
-  order(_createdAt desc)[0..3] {
+  const query = `*[_type == "discount"] | order(_createdAt desc)[0..3] {
     "id": _id,
     _id,
     name,
@@ -58,8 +57,8 @@ export async function getLatestDiscounts(): Promise<DiscountItem[]> {
   }`;
 
   try {
-    const discounts = await client.fetch(query, {}, { next: { revalidate: 60 } });
-    // عمل كاش لمدة دقيقة لسرعة الأداء
+    // 🔥 التعديل: استبدال الـ revalidate: 60 الزمني بـ tags للـ On-demand الحقيقي والذكي
+    const discounts = await client.fetch(query, {}, { next: { tags: ['discounts'] } });
     return discounts;
   } catch (error) {
     console.error("Error fetching latest discounts:", error);
@@ -71,8 +70,7 @@ export async function getLatestDiscounts(): Promise<DiscountItem[]> {
  * جلب جميع عروض الخصومات لصفحة الخصومات الشاملة
  */
 export async function getAllDiscounts(): Promise<DiscountItem[]> {
-  const query = `*[_type == "discount"] |
-  order(_createdAt desc) {
+  const query = `*[_type == "discount"] | order(_createdAt desc) {
     "id": _id,
     _id,
     name,
@@ -98,7 +96,8 @@ export async function getAllDiscounts(): Promise<DiscountItem[]> {
   }`;
 
   try {
-    const discounts = await client.fetch(query, {}, { next: { revalidate: 60 } });
+    // 🔥 التعديل: استبدال الـ revalidate: 60 بـ tags لمنع طلب البيانات بدون داعٍ وتسريع الـ TTFB
+    const discounts = await client.fetch(query, {}, { next: { tags: ['discounts'] } });
     return discounts;
   } catch (error) {
     console.error("Error fetching all discounts:", error);
@@ -123,7 +122,6 @@ export async function saveUserDiscount(userId: string, discountId: string) {
       },
       body: JSON.stringify({ userId, discountId }),
     });
-
     if (!res.ok) {
         const errorText = await res.text();
         console.error('Server error response:', errorText);

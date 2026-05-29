@@ -84,35 +84,38 @@ export default async function DiscountSlugPage({ params }: Props) {
     notFound();
   }
 
+  const storeName = discount.store?.name || "Savvy Bee Deals";
+
   // بناء بيانات الـ Schema الفخمة لعرض الأسعار القديمة والجديدة مباشرة في جوجل (Rich Snippet Price)
   const jsonLdSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": discount.name,
-    "description": discount.description || `Save ${discount.discountPercentage}% off on ${discount.name} at ${discount.store?.name || 'our partner store'}.`,
+    "description": discount.description || `Save ${discount.discountPercentage}% off on ${discount.name} at ${storeName}.`,
     "image": discount.productImage || discount.store?.logo || "https://savvybeedeals.com/favicon.ico",
+    "brand": {
+      "@type": "Brand",
+      "name": storeName
+    },
     "offers": {
       "@type": "Offer",
       "price": discount.currentPrice || "0",
       "priceCurrency": "USD",
       "availability": "https://schema.org/InStock",
-      "validThrough": discount.expiryDate || undefined,
-      "priceSpecification": discount.oldPrice ? {
-        "@type": "PriceSpecification",
-        "price": discount.oldPrice,
-        "priceCurrency": "USD",
-        "valueAddedTaxIncluded": "false"
-      } : undefined,
+      "validThrough": discount.expiryDate ? new Date(discount.expiryDate).toISOString().split('T')[0] : undefined,
+      "url": `https://savvybeedeals.com/discounts/${discountSlug}`,
       "seller": {
         "@type": "Organization",
-        "name": discount.store?.name || "Savvy Bee Deals"
+        "name": storeName
       }
     },
-    "aggregateRating": discount.rating ? {
-      "@type": "AggregateRating",
-      "ratingValue": discount.rating,
-      "reviewCount": discount.usersCount || 15
-    } : undefined
+    ...(discount.rating ? {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": discount.rating.toString(),
+        "reviewCount": discount.usersCount && discount.usersCount > 0 ? discount.usersCount.toString() : "15"
+      }
+    } : {})
   };
 
   return (

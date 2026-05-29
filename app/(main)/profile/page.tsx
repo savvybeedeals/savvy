@@ -360,9 +360,9 @@ export default function ProfilePage() {
                   >
                     <ShoppingBag size={14} /> Shop Premium Deals Now
                   </Link>
-                  <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5 truncate max-w-full">
+                  <div className="text-xs font-medium text-slate-400 flex items-center gap-1.5 truncate max-w-full">
                     <Mail size={13} className="shrink-0" /> <span className="truncate">{user.email}</span>
-                  </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -485,7 +485,7 @@ export default function ProfilePage() {
             </motion.section>
           )}
 
-          {/* سيكشن الكوبونات الثاني: Coupon */}
+          {/* سيكشن الكوبونات الثاني: Coupon (تعديل الـ Grid ليأخذ عمودين بالوضع الطبيعي للحفاظ على هيكله الأفقي) */}
           {activeTab === 'coupons' && (
             <motion.section
               key="profile-coupons-tab"
@@ -496,7 +496,7 @@ export default function ProfilePage() {
               className="space-y-6"
             >
               {allCoupons.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {allCoupons.slice(0, visibleCoupons).map((coupon) => (
                     <CouponCard key={coupon._id || coupon.id} coupon={coupon as any} />
                   ))}
@@ -522,7 +522,7 @@ export default function ProfilePage() {
             </motion.section>
           )}
 
-          {/* سيكشن العروض الثالث الحصري والمعدل لحل المشكلة بشكل كامل بنسبة 100% 🔥 */}
+          {/* سيكشن العروض الثالث: Deals (تعديل الـ Grid ليأخذ عمودين بالوضع الطبيعي المطابق للتصميم) */}
           {activeTab === 'deals' && (
             <motion.section
               key="profile-deals-tab"
@@ -533,7 +533,7 @@ export default function ProfilePage() {
               className="space-y-6"
             >
               {allDeals.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {allDeals.slice(0, visibleDeals).map((deal) => (
                     <DealCard
                       key={deal._id}
@@ -602,7 +602,7 @@ export default function ProfilePage() {
 
               <div className="space-y-1">
                 <h3 className="text-base font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  Update Avatar Pic
+                  <Camera size={18} className="text-amber-500" /> Update Avatar Pic
                 </h3>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed">
                   Upload a fresh custom profile picture. Supported formats are JPG, PNG, and WebP.
@@ -647,9 +647,32 @@ export default function ProfilePage() {
                         <Plus size={12} />
                       </button>
                     </div>
+
+                    <div className="flex gap-3 w-full pt-2">
+                      <button
+                        onClick={() => {
+                          setSelectedImage(null);
+                          setImageFile(null);
+                        }}
+                        className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase rounded-xl transition-all"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleUploadAvatar}
+                        disabled={isUploadingAvatar}
+                        className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs uppercase rounded-xl transition-all shadow-md shadow-amber-500/10 flex items-center justify-center gap-2"
+                      >
+                        {isUploadingAvatar ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          "Save Avatar"
+                        )}
+                      </button>
+                    </div>
                   </div>
                 ) : (
-                  <label className="w-full max-w-xs h-40 rounded-[2rem] border-2 border-dashed border-slate-200 hover:border-amber-400 bg-slate-50/50 hover:bg-amber-50/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 cursor-pointer p-4 group select-none">
+                  <label className="w-full max-w-xs h-40 rounded-[2rem] border-2 border-dashed border-slate-200 hover:border-amber-400 bg-slate-50/50 hover:bg-amber-50/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 cursor-pointer p-4 group select-none relative">
                     <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-amber-500 transition-colors">
                       <Upload size={18} />
                     </div>
@@ -658,57 +681,20 @@ export default function ProfilePage() {
                     <input 
                       type="file" 
                       accept="image/*" 
+                      onChange={handleImageChange}
                       className="hidden" 
-                      onChange={handleImageChange} 
                     />
                   </label>
                 )}
               </div>
-
-              {/* أزرار إنهاء الرفع المطور والحفظ الفوري */}
-              <div className="pt-2">
-                <div className="flex items-center gap-3">
-                  {selectedImage && (
-                    <button
-                      type="button"
-                      disabled={isUploadingAvatar}
-                      onClick={() => {
-                        setSelectedImage(null);
-                        setImageFile(null);
-                      }}
-                      className="px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-black text-xs uppercase tracking-wider rounded-xl border border-slate-200/60 transition-all cursor-pointer text-center"
-                    >
-                      Change
-                    </button>
-                  )}
-                  <button 
-                    type="button"
-                    disabled={!imageFile || isUploadingAvatar}
-                    onClick={handleUploadAvatar}
-                    className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-slate-200 disabled:to-slate-200 text-white disabled:text-slate-400 font-black text-xs uppercase tracking-wider rounded-xl shadow-sm border border-amber-500 hover:border-amber-600 disabled:border-slate-200 transition-all cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    {isUploadingAvatar ? (
-                      <>
-                        <Loader2 size={14} className="animate-spin" />
-                        <span>Uploading...</span>
-                      </>
-                    ) : (
-                      <span>Save Avatar</span>
-                    )}
-                  </button>
-                </div>
-              </div>
             </motion.div>
           </div>
         )}
+
+        {isSettingsOpen && (
+          <ProfileSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+        )}
       </AnimatePresence>
-
-      {/* مودال إعدادات الحساب وتعديل البيانات الشخصية */}
-      <ProfileSettingsModal 
-        isOpen={isSettingsOpen} 
-        onClose={() => setIsSettingsOpen(false)} 
-      />
-
     </div>
   );
 }

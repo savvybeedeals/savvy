@@ -49,27 +49,35 @@ export default async function CouponSlugPage({ params }: Props) {
     notFound();
   }
 
-  // بناء بيانات الـ Schema المهيكلة لدعم الـ Rich Snippets في جوجل
+  // بناء بيانات الـ Schema المهيكلة المتقدمة لدعم الـ Rich Snippets في جوجل بالأسواق الأمريكية والأوروبية
   const jsonLdSchema = {
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": "SaleEvent",
     "name": coupon.title,
     "description": coupon.description || `Exclusive coupon code for ${coupon.store?.name || 'our partner store'}.`,
-    "image": coupon.store?.logo || coupon.productImage || "https://savvybeedeals.com/favicon.ico",
+    "url": `https://savvybeedeals.com/coupons/${couponSlug}`,
+    "startDate": new Date().toISOString().split('T')[0],
+    "endDate": coupon.expiryDate ? new Date(coupon.expiryDate).toISOString().split('T')[0] : "2027-12-31",
+    "location": {
+      "@type": "VirtualLocation",
+      "url": coupon.affiliateUrl || "https://savvybeedeals.com"
+    },
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD",
       "availability": "https://schema.org/InStock",
-      "itemOffered": {
-        "@type": "Coupon",
-        "name": coupon.title,
-        "promoCode": coupon.promoCode || ""
-      },
+      "validFrom": new Date().toISOString().split('T')[0],
       "seller": {
         "@type": "Organization",
         "name": coupon.store?.name || "Savvy Bee Deals"
       }
+    },
+    "promoCode": coupon.code || coupon.promoCode || "DIRECT",
+    "organizer": {
+      "@type": "Organization",
+      "name": coupon.store?.name || "Savvy Bee Deals",
+      "url": `https://savvybeedeals.com/stores/${coupon.store?.slug || ''}`
     }
   };
 

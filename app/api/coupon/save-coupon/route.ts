@@ -23,18 +23,14 @@ export async function POST(request: Request) {
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
     
-    // إنشاء عميل Supabase مخصص يحمل توكن المستخدم لتخطي الـ RLS
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      global: {
-        headers: { Authorization: authHeader },
-      },
-    });
+    // 1. إنشاء عميل افتراضي للتحقق من التوكن فقط
+    const supabaseAuthClient = createClient(supabaseUrl, supabaseAnonKey);
 
-    // 🔥 خطوة التأمين الإضافية (التحقق الفعلي من التوكن ومطابقة المستخدم لمنع الـ Spams)
+    // 🔥 خطوة التأمين (التحقق الفعلي من التوكن ومطابقة المستخدم لمنع الـ Spams)
     const token = authHeader.split(' ')[1];
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const { data: { user }, error: authError } = await supabaseAuthClient.auth.getUser(token);
 
     if (authError || !user || user.id !== userId) {
       return NextResponse.json(
@@ -43,9 +39,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // إدخال البيانات في جدول الكوبونات المحفوظة الفعلي الخاص بك (saved_coupons)
-    // نستخدم هنا .upsert مع الـ onConflict ليكون الكود مرناً ونظيفاً جداً
-    const { data, error } = await supabase
+    // 2. تـعـديـل جـوهـري: إنشاء عميل بصلاحيات الخدمة (Service Role) لإتمام الإدخال بأمان وتخطي الـ RLS
+    // تأكد من وجود SUPABASE_SERVICE_ROLE_KEY في ملف الـ .env.local الخاص بك
+    const supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+
+    // إدخال البيانات باستخدام عميل الأدمن الموثوق
+    const { data, error } = await supabaseAdmin
       .from('saved_coupons')
       .upsert(
         { user_id: userId, coupon_id: couponId },

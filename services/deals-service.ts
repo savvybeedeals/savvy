@@ -3,8 +3,7 @@ import { supabase } from "@/lib/supabase";
 
 // دالة جلب جميع العروض المتاحة مرتبة من الأحدث للأقدم
 export async function getAllDeals() {
-  const query = `*[_type == "deal"] |
-  order(_createdAt desc) {
+  const query = `*[_type == "deal"] | order(_createdAt desc) {
     _id,
     title,
     description,
@@ -27,7 +26,8 @@ export async function getAllDeals() {
     }
   }`;
   try {
-    const deals = await client.fetch(query, {}, { next: { revalidate: 0 } });
+    // 🔥 التعديل: استبدال revalidate: 0 بنظام الـ tags لربطها بالـ Webhook ومنع بطء الصفحة
+    const deals = await client.fetch(query, {}, { next: { tags: ['deals'] } });
     return deals || [];
   } catch (error) {
     console.error("Error fetching deals:", error);
@@ -38,7 +38,6 @@ export async function getAllDeals() {
 // جلب عرض واحد فريد بواسطة الـ Slug الخاص به لدعم صفحة الـ Deal الفردية
 export async function getDealBySlug(slug: string) {
   if (!slug) return null;
-  
   const query = `*[_type == "deal" && slug.current == $slug][0] {
     _id,
     title,
@@ -62,8 +61,8 @@ export async function getDealBySlug(slug: string) {
     }
   }`;
   try {
-    // إيقاف الكاش أثناء جلب الصفحات الفردية للتجربة الحية الفورية revalidate: 0
-    const deal = await client.fetch(query, { slug }, { next: { revalidate: 0 } });
+    // 🔥 التعديل: ربط الـ tag هنا أيضاً لتحديث كاش الصفحة الفردية بمجرد تعديل العرض في Sanity
+    const deal = await client.fetch(query, { slug }, { next: { tags: ['deals'] } });
     return deal;
   } catch (error) {
     console.error("Error fetching deal by slug:", error);
@@ -73,8 +72,7 @@ export async function getDealBySlug(slug: string) {
 
 // دالة جلب آخر 4 عروض فقط للصفحة الرئيسية
 export async function getLatestDeals() {
-  const query = `*[_type == "deal"] |
-  order(_createdAt desc)[0...4] {
+  const query = `*[_type == "deal"] | order(_createdAt desc)[0...4] {
     _id,
     title,
     description,
@@ -96,7 +94,8 @@ export async function getLatestDeals() {
     }
   }`;
   try {
-    const deals = await client.fetch(query);
+    // 🔥 التعديل: تفعيل الـ ISR لربط كاش العروض بالصفحة الرئيسية
+    const deals = await client.fetch(query, {}, { next: { tags: ['deals'] } });
     return deals || [];
   } catch (error) {
     console.error("Error fetching latest deals:", error);
@@ -112,7 +111,6 @@ export async function updateDealStats(dealId: string, type: 'usage' | 'rating', 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ dealId, type, ratingValue }),
     });
-
     if (!res.ok) {
         const errorText = await res.text();
         console.error('Server error response while updating deal stats:', errorText);
@@ -140,7 +138,6 @@ export async function saveUserDeal(userId: string, dealId: string) {
       },
       body: JSON.stringify({ userId, dealId }),
     });
-
     if (!res.ok) {
         const errorText = await res.text();
         console.error('Server error response:', errorText);

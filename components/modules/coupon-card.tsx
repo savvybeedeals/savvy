@@ -112,10 +112,10 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
         <div className="absolute -right-[11px] top-1/2 -translate-y-1/2 w-5 h-10 bg-[#F8F9FA] rounded-full border-l-2 border-inherit z-10"></div>
 
         {isVip && (
-          <div className="absolute -top-4 -left-2 z-20 scale-100">
+          <div className="absolute -top-4 -left-2 z-20 scale-100 w-[78px] h-[38px]">
             <div className="absolute inset-0 bg-[#FFD700] rounded-full blur-lg opacity-30 animate-pulse"></div>
-            <div className="relative bg-[#FFD700] text-black px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 border-2 border-white overflow-hidden">
-              <span className="text-base">🐝</span>
+            <div className="relative bg-[#FFD700] text-black px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 border-2 border-white overflow-hidden w-full h-full">
+              <span className="text-base leading-none">🐝</span>
               <div className="flex flex-col leading-none">
                 <span className="text-[7px] font-black uppercase tracking-tighter opacity-80">Savvy</span>
                 <span className="text-[11px] font-black uppercase italic">VIP</span>
@@ -126,28 +126,29 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
         )}
 
         <div className="flex flex-col items-center gap-2 shrink-0">
-          {/* Increased logo size from w-20 h-20 to w-20 h-20 */}
-          <div className={`w-20 h-20 rounded-full flex items-center justify-center overflow-hidden shadow-sm border-2 border-gray-50 bg-white group-hover:rotate-12 group-hover:scale-110 transition-transform duration-300`}>
+          {/* Increased logo size from w-20 h-20 to w-20 h-20 - Fixed with absolute aspect ratio shell for CLS */}
+          <div className="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden shadow-sm border-2 border-gray-50 bg-white group-hover:rotate-12 group-hover:scale-110 transition-transform duration-300 relative">
             {store?.logo ? (
               <Image 
                 src={urlFor(store.logo).url()} 
                 alt={storeName} 
-                width={80} 
-                height={80} 
+                fill
+                sizes="80px"
+                priority
                 className="object-contain p-2.5"
               />
             ) : (
               <span className="text-2xl font-black text-slate-300">{storeName.charAt(0)}</span>
             )}
           </div>
-          <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${type === 'Code' ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700'}`}>
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest min-w-[55px] justify-center h-5 bg-amber-100 text-amber-700">
             {type === 'Code' ? <Ticket size={10} /> : <Tag size={10} />}
-            {type}
+            <span>{type}</span>
           </div>
         </div>
 
         <div className="flex-grow min-w-0">
-          <div className="flex items-center gap-2.5 mb-1">
+          <div className="flex items-center gap-2.5 mb-1 h-8">
             {/* Increased discount text size from text-2xl to text-2xl */}
             <span className="text-2xl font-black text-black tracking-tight whitespace-nowrap">{discount}</span>
             <div className="flex items-center gap-1.5 overflow-hidden">
@@ -163,14 +164,14 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
           
           {/* Increased title size from text-[15px] to text-[15px] */}
           {/* 🔥 تحويل العنوان إلى رابط لتهيئة محركات البحث وجوجل للأرشفة الذاتية */}
-          <h3 className="text-[15px] font-bold text-gray-700 leading-tight line-clamp-2 group-hover:text-sky-600 transition-colors">
+          <h3 className="text-[15px] font-bold text-gray-700 leading-tight line-clamp-2 h-10 group-hover:text-sky-600 transition-colors">
             <Link href={couponPageUrl} className="hover:underline">
               {title}
             </Link>
           </h3>
           
-          <div className="flex flex-wrap items-center gap-2.5 mt-3 pt-3 border-t border-gray-50">
-              <div className="flex items-center gap-1.5 bg-green-50 px-2 py-1 rounded-md border border-green-100">
+          <div className="flex flex-wrap items-center gap-2.5 mt-3 pt-3 border-t border-gray-50 h-7">
+              <div className="flex items-center gap-1.5 bg-green-50 px-2 py-1 rounded-md border border-green-100 h-5">
                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span> 
                 <span className="text-green-600 text-[9px] font-black uppercase whitespace-nowrap">Verified</span>
               </div>
@@ -178,8 +179,8 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
                 <TrendingUp size={12} />
                 <span>{usersCount}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-gray-400 font-bold text-[10px] italic hidden sm:flex">
-                <Clock size={11} />
+              <div className="items-center gap-1.5 text-gray-400 font-bold text-[10px] italic hidden sm:flex max-w-[80px]">
+                <Clock size={11} className="shrink-0" />
                 <span className="truncate">{expiryDate || 'Soon'}</span>
               </div>
               <div className="flex items-center gap-1.5 text-gray-400 font-bold text-[10px] whitespace-nowrap">
@@ -193,17 +194,17 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
         <div className="flex flex-col items-center gap-2.5 shrink-0 min-w-[125px]">
           <button 
             onClick={handleGetCode}
-            className={`w-full py-3.5 rounded-[1.2rem] font-black text-[13px] transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5 ${isVip ? 'bg-[#FFD700] hover:bg-black hover:text-[#FFD700] text-black' : 'bg-[#1A1A1A] hover:bg-sky-600 text-white'}`}
+            className={`w-full h-11 rounded-[1.2rem] font-black text-[13px] transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5 ${isVip ? 'bg-[#FFD700] hover:bg-black hover:text-[#FFD700] text-black' : 'bg-[#1A1A1A] hover:bg-sky-600 text-white'}`}
           >
             {isVip && !isLoggedIn && <Lock size={14} />}
-            {isVip && !isLoggedIn ? 'UNLOCK' : 'GET CODE'}
+            <span>{isVip && !isLoggedIn ? 'UNLOCK' : 'GET CODE'}</span>
           </button>
           
           <Link 
             href={`/stores/${storeSlug}`} 
-            className="text-[11px] font-black text-sky-500 hover:text-sky-700 transition-colors flex items-center gap-1 group/link"
+            className="text-[11px] font-black text-sky-500 hover:text-sky-700 transition-colors flex items-center gap-1 group/link h-4"
           >
-            Store Page
+            <span>Store Page</span>
             <ExternalLink size={11} className="group-hover/link:translate-x-0.5 transition-transform" />
           </Link>
         </div>
@@ -290,18 +291,18 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
                 <div className={`absolute -inset-1 rounded-[2rem] blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200 ${isVip ? 'bg-[#FFD700]' : 'bg-sky-400'}`}></div>
                 
                 <div className="relative flex items-center justify-between bg-gray-50 border-2 border-dashed border-gray-200 p-3 rounded-[2rem] hover:border-amber-400 hover:bg-white transition-all">
-                  <div className="flex flex-col ml-8">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  <div className="flex flex-col ml-8 min-h-[58px] justify-center">
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block h-4">
                        {copied ? "Copy Successful! Redirecting..." : "Click to Copy & Visit"}
                     </span>
-                    <span className={`text-4xl font-black tracking-[0.15em] ${isVip ? 'text-amber-600' : 'text-gray-800'}`}>
+                    <span className={`text-4xl font-black tracking-[0.15em] block ${isVip ? 'text-amber-600' : 'text-gray-800'}`}>
                       {code}
                     </span>
                   </div>
                   
-                  <div className={`flex items-center gap-3 px-8 py-5 rounded-[1.5rem] font-black text-xl transition-all shadow-xl shadow-amber-100/50 ${copied ? 'bg-green-500 text-white min-w-[180px] justify-center' : 'bg-[#1A1A1A] text-white group-hover:bg-[#FFD700] group-hover:text-black'}`}>
+                  <div className={`flex items-center gap-3 px-8 py-5 rounded-[1.5rem] font-black text-xl transition-all shadow-xl shadow-amber-100/50 h-[68px] ${copied ? 'bg-green-500 text-white min-w-[180px] justify-center' : 'bg-[#1A1A1A] text-white group-hover:bg-[#FFD700] group-hover:text-black'}`}>
                     {copied ? <Check size={24} strokeWidth={3} /> : <Copy size={24} />}
-                    {copied ? 'COPIED!' : 'COPY'}
+                    <span>{copied ? 'COPIED!' : 'COPY'}</span>
                   </div>
                 </div>
               </a>
@@ -311,13 +312,13 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
                   href={affiliateUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center justify-center gap-3 py-4 rounded-2xl font-black text-lg transition-all shadow-xl shadow-sky-100/50 active:scale-95 ${isVip ? 'bg-white border-2 border-amber-400 text-gray-900 hover:bg-amber-50' : 'bg-sky-500 text-white hover:bg-sky-600'}`}
+                  className={`flex items-center justify-center gap-3 py-4 rounded-2xl font-black text-lg transition-all shadow-xl shadow-sky-100/50 active:scale-95 h-14 ${isVip ? 'bg-white border-2 border-amber-400 text-gray-900 hover:bg-amber-50' : 'bg-sky-500 text-white hover:bg-sky-600'}`}
                 >
                   Visit {storeName} <ExternalLink size={20} />
                 </a>
                 
-                <div className="flex flex-col justify-center bg-amber-50/50 border border-amber-100 px-6 py-4 rounded-2xl transition-all">
-                  <div className="flex items-center justify-between mb-1">
+                <div className="flex flex-col justify-center bg-amber-50/50 border border-amber-100 px-6 py-4 rounded-2xl transition-all h-14">
+                  <div className="flex items-center justify-between mb-1 h-4">
                     <span className="text-amber-800 font-black text-[11px] uppercase tracking-wider">
                       {userRating > 0 ? "Thanks for rating!" : "Did it work?"}
                     </span>
@@ -328,14 +329,14 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
                     )}
                   </div>
                   
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-1.5 h-6">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
                         onMouseEnter={() => setHoverRating(star)}
                         onMouseLeave={() => setHoverRating(0)}
                         onClick={() => handleRating(star)}
-                        className="transition-all duration-200 transform active:scale-125"
+                        className="transition-all duration-200 transform active:scale-125 w-6 h-6"
                       >
                         <Star 
                           size={24} 
@@ -349,7 +350,7 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
               </div>
 
               {/* Troubleshooting Alert */}
-              <div className="mt-6 flex items-start gap-3 p-4 bg-amber-50/30 border border-amber-100/50 rounded-2xl">
+              <div className="mt-6 flex items-start gap-3 p-4 bg-amber-50/30 border border-amber-100/50 rounded-2xl min-h-[82px]">
                 <AlertCircle size={20} className="text-amber-600 shrink-0 mt-0.5" />
                 <div className="flex flex-col gap-1 text-left">
                   <p className="text-[12px] font-black text-amber-900 uppercase tracking-tight">Trouble Redirecting?</p>
@@ -360,12 +361,12 @@ const CouponCard: React.FC<CouponProps> = ({ coupon }) => {
               </div>
 
               {/* Footer Info with Fixed Rating Formatting */}
-              <div className="mt-10 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] font-black text-gray-400 uppercase tracking-widest border-t border-gray-50 pt-8">
-                <div className="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1 rounded-full border border-green-100">
+              <div className="mt-10 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] font-black text-gray-400 uppercase tracking-widest border-t border-gray-50 pt-8 h-auto md:h-14">
+                <div className="flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1 rounded-full border border-green-100 h-7">
                   <CheckCircle2 size={12} />
                   Tested & Verified 2 hours ago
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 h-7">
                   <span className="flex items-center gap-1.5 whitespace-nowrap"><TrendingUp size={14} /> {usersCount} Uses Today</span>
                   
                   <div className="flex items-center flex-row gap-1 whitespace-nowrap">

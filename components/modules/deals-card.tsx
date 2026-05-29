@@ -97,8 +97,9 @@ const DealCard: React.FC<DealProps> = (props) => {
             <Image 
               src={urlFor(storeLogo).url()} 
               alt={storeName}
-              width={80}
-              height={80}
+              fill
+              sizes="80px"
+              priority={isVip}
               className="object-contain p-2 transform group-hover:scale-110 transition-transform duration-300"
             />
           ) : (
