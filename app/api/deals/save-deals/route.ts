@@ -15,28 +15,46 @@ export async function POST(request: Request) {
       );
     }
 
-    // إنشاء عميل Supabase مخصص لهذه العملية يحمل توكن المستخدم
+    // التحقق من وجود التوكن وهيكلته لمنع الطلبات العشوائية (Spam)
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { success: false, message: 'Unauthorized: Missing or invalid token format' }, 
+        { status: 401 }
+      );
+    }
+
+    // إنشاء عميل Supabase مخصص لهذه العملية يحمل توكن المستخدم الحالي
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
     
     const supabase = createClient(supabaseUrl, supabaseKey, {
       global: {
-        headers: authHeader ? { Authorization: authHeader } : {},
+        headers: { Authorization: authHeader },
       },
     });
 
-    // إدخال البيانات في جدول العروض المحفوظة
+    // 🔥 الخطوة الثالثة: فك التوكن والتحقق من الهوية ومطابقة الـ IDs لمنع التلاعب
+    const token = authHeader.split(' ')[1];
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user || user.id !== userId) {
+      return NextResponse.json(
+        { success: false, message: 'Forbidden: Invalid token or user mismatch' }, 
+        { status: 403 }
+      );
+    }
+
+    // 🔥 الخطوة الثانية: الحفظ الآمن في جدول العروض الفعلي باستخدام الـ upsert لمنع تكرار البيانات هدوء
     const { data, error } = await supabase
       .from('saved_deals')
-      .insert([{ user_id: userId, deal_id: dealId }])
+      .upsert(
+        { user_id: userId, deal_id: dealId },
+        { onConflict: 'user_id,deal_id' }
+      )
       .select();
 
     if (error) {
-      // تجاهل الخطأ إذا كان العرض محفوظاً بالفعل (بسبب قيد unique)
-      if (error.code === '23505') {
-        return NextResponse.json({ success: true, message: 'Deal already saved' });
-      }
-      console.error('Supabase insert error:', error);
+      console.error('Supabase upsert error:', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
